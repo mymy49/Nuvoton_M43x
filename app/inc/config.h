@@ -35,8 +35,8 @@
 #define HSE_CLOCK_FREQ 12000000
 
 // ####################### 스케줄러 설정 #######################
-// runtime 함수를 지원할 PWM 장치 설정 (RUNTIME_TIM3, 14, 15, 16, 17)
-#define YSS_TIMER			RUNTIME_TIM3
+// runtime 함수를 지원할 PWM 장치 설정 (RUNTIME_TIMER0, 1, 2, 3, 4)
+#define YSS_TIMER			RUNTIME_TIMER0
 
 // 쓰레드당 할당 받는 Systick Clock의 수
 #define THREAD_GIVEN_CLOCK	20000
