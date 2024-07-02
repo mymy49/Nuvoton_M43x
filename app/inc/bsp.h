@@ -24,6 +24,8 @@
 #ifndef BSP__H_
 #define BSP__H_
 
+#include <dev/led.h>
+
 void initializeBoard(void);
 
 #endif

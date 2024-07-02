@@ -21,63 +21,19 @@
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <yss.h>
-#include <bsp.h>
+#ifndef DEV_LED__H_
+#define DEV_LED__H_
 
-void thread_blinkLedR(void);
-void thread_blinkLedY(void);
-void thread_blinkLedG(void);
-
-int main(void)
+namespace led
 {
-	// 운영체체 초기화
-	initializeYss();
+	void initialize(void) __attribute__((optimize("-O1")));
 
-	// 보드 초기화
-	initializeBoard();
+	void setLedR(bool on) __attribute__((optimize("-O1")));
 
-	thread::add(thread_blinkLedR, 512);
-	thread::add(thread_blinkLedG, 512);
-	thread::add(thread_blinkLedY, 512);
+	void setLedY(bool on) __attribute__((optimize("-O1")));
 
-	while(1)
-	{
-		thread::yield();
-	}
+	void setLedG(bool on) __attribute__((optimize("-O1")));
 }
 
-void thread_blinkLedR(void)
-{
-	while(1)
-	{
-		led::setLedR(true);
-		thread::delay(250);
+#endif
 
-		led::setLedR(false);
-		thread::delay(250);
-	}
-}
-
-void thread_blinkLedG(void)
-{
-	while(1)
-	{
-		led::setLedG(true);
-		thread::delay(500);
-
-		led::setLedG(false);
-		thread::delay(500);
-	}
-}
-
-void thread_blinkLedY(void)
-{
-	while(1)
-	{
-		led::setLedY(true);
-		thread::delay(1000);
-
-		led::setLedY(false);
-		thread::delay(1000);
-	}
-}
