@@ -22,11 +22,19 @@
 */
 
 #include <bsp.h>
-//#include <yss/instance.h>
+#include <yss/instance.h>
 
 void initializeBoard(void)
 {
 	// LED 초기화
 	led::initialize();
+
+	// UART0 초기화
+	gpioB.setAsAltFunc(12, Gpio::PB12_UART0_RXD);
+	gpioB.setAsAltFunc(13, Gpio::PB13_UART0_TXD);
+
+	uart0.enableClock();
+	uart0.initialize(115200, 64);
+	uart0.enableInterrupt();
 }
 
