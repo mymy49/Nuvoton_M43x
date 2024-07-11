@@ -36,5 +36,15 @@ void initializeBoard(void)
 	uart0.enableClock();
 	uart0.initialize(115200, 64);
 	uart0.enableInterrupt();
+
+	// SPI1 초기화
+	gpioC.setAsOutput(0);
+	gpioC.setAsAltFunc(1, Gpio::PC1_SPI1_CLK);
+	gpioC.setAsAltFunc(2, Gpio::PC2_SPI1_MOSI);
+	gpioC.setAsAltFunc(3, Gpio::PC3_SPI1_MISO);
+
+	spi1.enableClock();
+	spi1.initializeAsMain();
+	spi1.enableInterrupt();
 }
 

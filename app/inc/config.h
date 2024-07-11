@@ -65,6 +65,10 @@
 // 주의 
 // 1. TIMER, PWM, CAPTURE는 실제 동일한 장치지만 OS 구조상 별도의 장치로 표현한다. 그러므로 동일한 번호의 TIMER, PWM, CAPTURE는 동시에 활성화 되지 못한다.
 
+// SPI 활성화
+#define SPI0_ENABLE			false
+#define SPI1_ENABLE			true
+
 // UART 활성화
 #define UART0_ENABLE		true
 #define UART1_ENABLE		false

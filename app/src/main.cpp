@@ -32,6 +32,13 @@ void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
 
+static const Spi::specification_t gConfig =
+{
+	Spi::MODE_MODE1,	//uint8_t mode;
+	20000000,			//uint32_t maxFreq;
+	Spi::BIT_BIT8		//uint8_t bit;
+}; 
+
 int main(void)
 {
 	uint32_t count;
@@ -64,6 +71,9 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
 
+	spi1.setSpecification(gConfig);
+	spi1.enable(true);
+
 	while(1)
 	{
 		count = uart0.getRxCount();
@@ -78,6 +88,8 @@ int main(void)
 		}
 
 		debug_printf("%d\r", (uint32_t)runtime::getMsec());
+
+		spi1.send((int8_t)0xAA);
 	}
 }
 
