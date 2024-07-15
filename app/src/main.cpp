@@ -89,7 +89,7 @@ int main(void)
 
 		debug_printf("%d\r", (uint32_t)runtime::getMsec());
 
-		spi1.send((int8_t)0xAA);
+		spi1.send(sa, 32);
 	}
 }
 
