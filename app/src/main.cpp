@@ -16,64 +16,36 @@ void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
 
-static const Spi::specification_t gConfig =
+uint32_t gTimer0Cnt;
+
+void isr_timer0(void)
 {
-	Spi::MODE_MODE1,	//uint8_t mode;
-	20000000,			//uint32_t maxFreq;
-	Spi::BIT_BIT8		//uint8_t bit;
-}; 
+	gTimer0Cnt++;
+}
 
 int main(void)
 {
-	uint32_t count;
-	uint8_t *data;
-	uint8_t sa[32], da[32];
-
-	for(uint32_t i = 0; i < 32; i++)
-	{
-		sa[i] = i;
-		da[i] = 0;
-	}
-
 	// 운영체체 초기화
 	initializeYss();
 
 	// 보드 초기화
 	initializeBoard();
 
-	// DMA memory to memory Test
-	memcpyd(da, sa, 32);
-
-	memsetd(da, 0xAA, 32);
-
-	memsethwd(da, 0xBBCC, 16);
-
-	memsetwd(da, 0x12345678, 8);
-
 	thread::add(thread_blinkLedR, 512);
 	thread::add(thread_blinkLedG, 512);
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
 
-	spi1.setSpecification(gConfig);
-	spi1.enable(true);
+	timer0.enableClock();
+	timer0.initialize(1000);
+	timer0.setUpdateIsr(isr_timer0);
+	timer0.enableInterrupt();
+	timer0.start();
 
 	while(1)
 	{
-		count = uart0.getRxCount();
-
-		if(count)
-		{
-			data = (uint8_t*)uart0.getRxBuffer();
-			for(uint32_t i = 0; i < count; i++)
-				debug_printf("%c = 0x%02X\r\n", data[i], data[i]);
-			
-			uart0.releaseRxBuffer(count);
-		}
-
-		debug_printf("%d\r", (uint32_t)runtime::getMsec());
-
-		spi1.send(sa, 32);
+		debug_printf("%d\r", gTimer0Cnt);
+		thread::yield();
 	}
 }
 

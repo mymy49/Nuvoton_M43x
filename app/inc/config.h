@@ -18,7 +18,7 @@
 
 // ####################### 스케줄러 설정 #######################
 // runtime 함수를 지원할 PWM 장치 설정 (RUNTIME_TIMER0, 1, 2, 3, 4)
-#define YSS_TIMER			RUNTIME_TIMER0
+#define YSS_TIMER			RUNTIME_TIMER1
 
 // 쓰레드당 할당 받는 Systick Clock의 수
 #define THREAD_GIVEN_CLOCK	20000
@@ -28,10 +28,6 @@
 
 // 쓰레드의 스택을 0xAA 패턴으로 채우기 (true, false)
 #define FILL_THREAD_STACK	false
-
-// ####################### DMA 복사 설정 #######################
-// DMA를 사용하는 copy() 함수가 사용할 DMA를 지정한다. (dmaChannel1 ~ dmaChannel5)
-#define COPY_DMA			dmaChannel1
 
 // ####################### GUI 설정 #######################
 // GUI library Enable (true, false)
@@ -53,6 +49,12 @@
 // SPI 활성화
 #define SPI0_ENABLE			false
 #define SPI1_ENABLE			true
+
+// TIMER 활성화
+#define TIMER0_ENABLE		true
+#define TIMER1_ENABLE		false
+#define TIMER2_ENABLE		false
+#define TIMER3_ENABLE		false
 
 // UART 활성화
 #define UART0_ENABLE		true
