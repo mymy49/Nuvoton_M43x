@@ -23,6 +23,16 @@ void isr_timer0(void)
 	gTimer0Cnt++;
 }
 
+void isr_PD2(void)
+{
+	debug_printf("PD2!!\n", gTimer0Cnt);
+}
+
+void isr_PD3(void)
+{
+	debug_printf("PD3!!\n", gTimer0Cnt);
+}
+
 int main(void)
 {
 	// 운영체체 초기화
@@ -35,16 +45,14 @@ int main(void)
 	thread::add(thread_blinkLedG, 512);
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
-
-	timer0.enableClock();
-	timer0.initialize(1000);
-	timer0.setUpdateIsr(isr_timer0);
-	timer0.enableInterrupt();
-	timer0.start();
-
+	
+	// GPIO 인터럽트 활성화 예제
+	gpioD.enablInterrupt(2, Gpio::EDGE_FALLING, isr_PD2);
+	gpioD.enablInterrupt(3, Gpio::EDGE_FALLING, isr_PD3);
+	gpioD.enableInterrupt(true);
+	
 	while(1)
 	{
-		debug_printf("%d\r", gTimer0Cnt);
 		thread::yield();
 	}
 }
