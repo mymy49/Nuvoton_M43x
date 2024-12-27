@@ -16,23 +16,6 @@ void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
 
-uint32_t gTimer0Cnt;
-
-void isr_timer0(void)
-{
-	gTimer0Cnt++;
-}
-
-void isr_PD2(void)
-{
-	debug_printf("PD2!!\n", gTimer0Cnt);
-}
-
-void isr_PD3(void)
-{
-	debug_printf("PD3!!\n", gTimer0Cnt);
-}
-
 int main(void)
 {
 	// 운영체체 초기화
@@ -46,11 +29,14 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
 	
-	// GPIO 인터럽트 활성화 예제
-	gpioD.enablInterrupt(2, Gpio::EDGE_FALLING, isr_PD2);
-	gpioD.enablInterrupt(3, Gpio::EDGE_FALLING, isr_PD3);
-	gpioD.enableInterrupt(true);
-	
+	// PWM3 초기화
+	gpioB.setAsAltFunc(2, Gpio::PB2_PWM3_TM3);
+
+	pwm3.enableClock();
+	pwm3.initialize(1000);
+	pwm3.start();
+	pwm3.setDutyRatio(0.1);
+
 	while(1)
 	{
 		thread::yield();
