@@ -29,13 +29,24 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
 	
-	// PWM3 초기화
-	gpioB.setAsAltFunc(2, Gpio::PB2_PWM3_TM3);
+	// bpwm0 초기화
+	gpioA.setAsAltFunc(11, Gpio::PA11_BPWM0_CH0);
+	gpioA.setAsAltFunc(10, Gpio::PA10_BPWM0_CH1);
+	gpioA.setAsAltFunc(9, Gpio::PA9_BPWM0_CH2);;
+	gpioA.setAsAltFunc(8, Gpio::PA8_BPWM0_CH3);
 
-	pwm3.enableClock();
-	pwm3.initialize(1000);
-	pwm3.start();
-	pwm3.setDutyRatio(0.1);
+	bpwm0.enableClock();
+	bpwm0.initialize(1000);
+	bpwm0.setAsPwmOutput(0, true);
+	bpwm0.setAsPwmOutput(1);
+	bpwm0.setAsPwmOutput(2);
+	bpwm0.setAsPwmOutput(3);
+	bpwm0.start();
+
+	bpwm0.setDutyRatio(0, 0.1);
+	bpwm0.setDutyRatio(1, 0.2);
+	bpwm0.setDutyRatio(2, 0.3);
+	bpwm0.setDutyRatio(3, 0.4);
 
 	while(1)
 	{
