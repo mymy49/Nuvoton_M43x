@@ -11,21 +11,14 @@
 #include <yss/debug.h>
 #include <std_ext/string.h>
 #include <util/ElapsedTime.h>
+#include <UsbClass/Cdc.h>
+
+Cdc cdc;
 
 void thread_blinkLedR(void);
 void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
-
-void isr_PD2(void)
-{
-
-}
-
-void isr_PD3(void)
-{
-
-}
 
 int main(void)
 {
@@ -42,22 +35,18 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	//thread::add(thread_testUart, 512);
 	
-	// 버튼 인터럽트 초기화
-	gpioD.enablInterrupt(2, Gpio::EDGE_FALLING, isr_PD2);
-	gpioD.enablInterrupt(3, Gpio::EDGE_FALLING, isr_PD3);
-	gpioD.enableInterrupt(true);
+	// USBD 초기화
+	gpioA.setAsAltFunc(12, Gpio::PA12_USB_VBUS);
+	gpioA.setAsAltFunc(13, Gpio::PA13_USBD_DN);
+	gpioA.setAsAltFunc(14, Gpio::PA14_USBD_DP);
+	gpioA.setAsAltFunc(15, Gpio::PA15_USB_OTG_ID);
+
+	usbd.enableClock();
+	usbd.initialize(cdc);
+	usbd.enableInterrupt();
 	
-	powerDownTime.reset();
 	while(1)
 	{
-		if(powerDownTime.getMsec() >= 3000)
-		{
-			//clock.enterIdleMode();
-			clock.enterPowerDownMode();
-
-			powerDownTime.reset();
-		}
-
 		thread::yield();
 	}
 }
