@@ -17,8 +17,17 @@ void initializeBoard(void)
 	gpioB.setAsAltFunc(12, Gpio::PB12_UART0_RXD);
 	gpioB.setAsAltFunc(13, Gpio::PB13_UART0_TXD);
 
+	Uart::config_t uart0Config = 
+	{
+		Uart::MODE_NORMAL,	//mode_t mode;
+		115200,				//uint32_t baudrate;
+		Uart::STOP_1BIT,	//stopbit_t stopbit;
+		nullptr,			//void *rcvBuf;
+		64					//uint32_t rcvBufSize;
+	};
+
 	uart0.enableClock();
-	uart0.initialize(115200, 64);
+	uart0.initialize(uart0Config);
 	uart0.enableInterrupt();
 
 	// SPI1 초기화
