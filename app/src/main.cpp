@@ -11,9 +11,9 @@
 #include <yss/debug.h>
 #include <std_ext/string.h>
 #include <util/ElapsedTime.h>
-#include <UsbClass/Cdc.h>
+#include <UsbClass/NuvotonCdc.h>
 
-Cdc cdc;
+NuvotonCdc cdc;
 
 void thread_blinkLedR(void);
 void thread_blinkLedY(void);
@@ -35,6 +35,19 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	//thread::add(thread_testUart, 512);
 	
+	// CDC 초기화
+	Cdc::config_t cdcConfig = 
+	{
+		1,	//uint8_t inEpNum;
+		64,	//uint16_t inEpMaxPacketSize;
+		2,	//uint8_t outEpNum;
+		64,	//uint16_t outEpMaxPacketSize;
+		3,	//uint8_t ctlEpNum;
+		8	//uint16_t ctlEpMaxPacketSize;
+	};
+
+	cdc.initialize(cdcConfig);
+
 	// USBD 초기화
 	gpioA.setAsAltFunc(12, Gpio::PA12_USB_VBUS);
 	gpioA.setAsAltFunc(13, Gpio::PA13_USBD_DN);
