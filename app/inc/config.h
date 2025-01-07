@@ -46,6 +46,10 @@
 #define BPWM0_ENABLE		true
 #define BPWM1_ENABLE		true
 
+// EPWM 활성화
+#define EPWM0_ENABLE		true
+#define EPWM1_ENABLE		false
+
 // I2S 활성화
 #define I2S0_ENABLE			false
 #define I2S1_ENABLE			false
