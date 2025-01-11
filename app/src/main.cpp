@@ -12,6 +12,8 @@
 #include <std_ext/string.h>
 #include <util/ElapsedTime.h>
 #include <UsbClass/NuvotonCdc.h>
+#include <stdio.h>
+#include <string.h>
 
 NuvotonCdc cdc;
 
@@ -22,7 +24,8 @@ void thread_testUart(void);
 
 int main(void)
 {
-	ElapsedTime powerDownTime;
+	char sendBuf[256], rcvBuf[64];
+	uint32_t len, cnt = 0;
 
 	// 운영체체 초기화
 	initializeYss();
@@ -33,66 +36,27 @@ int main(void)
 	thread::add(thread_blinkLedR, 512);
 	thread::add(thread_blinkLedG, 512);
 	thread::add(thread_blinkLedY, 512);
-	//thread::add(thread_testUart, 512);
-
-	// EPWM0 초기화
-	gpioA.setAsAltFunc(5, Gpio::PA5_EPWM0_CH0);
-	gpioA.setAsAltFunc(4, Gpio::PA4_EPWM0_CH1);
-	gpioA.setAsAltFunc(3, Gpio::PA3_EPWM0_CH2);
-	gpioA.setAsAltFunc(2, Gpio::PA2_EPWM0_CH3);
-	gpioA.setAsAltFunc(1, Gpio::PA1_EPWM0_CH4);
-	gpioA.setAsAltFunc(0, Gpio::PA0_EPWM0_CH5);
-
-	epwm0.enableClock();
-	
-	// CH0 초기화
-	epwm0.initialize(0, 1000);
-	epwm0.setAsPwmOutput(0, true);
-	epwm0.start(0);
-	epwm0.setDutyRatio(0, 0.1);
-
-	// CH1 초기화
-	epwm0.initialize(1, 1000);
-	epwm0.setAsPwmOutput(1);
-	epwm0.start(1);
-	epwm0.setDutyRatio(1, 0.2);
-
-	// CH2 초기화
-	epwm0.initialize(2, 1000);
-	epwm0.setAsPwmOutput(2);
-	epwm0.start(2);
-	epwm0.setDutyRatio(2, 0.3);
-
-	// CH3 초기화
-	epwm0.initialize(3, 1000);
-	epwm0.setAsPwmOutput(3);
-	epwm0.start(3);
-	epwm0.setDutyRatio(3, 0.4);
-
-	// CH4 초기화
-	epwm0.initialize(4, 1000);
-	epwm0.setAsPwmOutput(4);
-	epwm0.start(4);
-	epwm0.setDutyRatio(4, 0.5);
-	
-	// CH5 초기화
-	epwm0.initialize(5, 1000);
-	epwm0.setAsPwmOutput(5);
-	epwm0.start(5);
-	epwm0.setDutyRatio(5, 0.6);
+	thread::add(thread_testUart, 512);
 
 	// CDC 초기화
+	const char *manufacture = "Nuvoton";
+	const char *product= "yss OS Virtual COM Port";
+
 	Cdc::config_t cdcConfig = 
 	{
-		1,	//uint8_t inEpNum;
-		64,	//uint16_t inEpMaxPacketSize;
-		2,	//uint8_t outEpNum;
-		64,	//uint16_t outEpMaxPacketSize;
-		3,	//uint8_t ctlEpNum;
-		8	//uint16_t ctlEpMaxPacketSize;
+		1,				//uint8_t inEpNum;
+		64,				//uint16_t inEpMaxPacketSize;
+		2,				//uint8_t outEpNum;
+		64,				//uint16_t outEpMaxPacketSize;
+		3,				//uint8_t ctlEpNum;
+		8,				//uint16_t ctlEpMaxPacketSize;
+		manufacture,	//const char *manufactureString;
+		product,		//const char *productString;
+		0				//const char *serialNumberString;
 	};
 
 	cdc.initialize(cdcConfig);
+	//cdc.initialize();
 
 	// USBD 초기화
 	gpioA.setAsAltFunc(12, Gpio::PA12_USB_VBUS);
@@ -103,9 +67,26 @@ int main(void)
 	usbd.enableClock();
 	usbd.initialize(cdc);
 	usbd.enableInterrupt();
+
+	thread::delay(5000);
 	
 	while(1)
 	{
+		if(cdc.isClearToSend())
+		{
+			sprintf(sendBuf, "Hello World!! Test String!! yss OS is Great Operating System!! Have a Enjoy!! %d\n\r", cnt++); 
+			len = strlen(sendBuf);
+			cdc.send(sendBuf, len); // 최대 초당 750 kB 전송속도 확인
+		}
+
+		len = cdc.getRxDataCount();
+		if(len > 0)
+		{
+			cdc.getRxData(rcvBuf, len);
+			for(uint32_t i = 0; i < len; i++)
+				debug_printf("%c", rcvBuf[i]);
+		}
+		
 		thread::yield();
 	}
 }
