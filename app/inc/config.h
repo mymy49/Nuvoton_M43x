@@ -24,7 +24,7 @@
 #define THREAD_GIVEN_CLOCK	20000
 
 // 최대 등록 가능한 쓰레드의 수
-#define MAX_THREAD			6
+#define MAX_THREAD			12
 
 // 쓰레드의 스택을 0xAA 패턴으로 채우기 (true, false)
 #define FILL_THREAD_STACK	false

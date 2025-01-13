@@ -11,22 +11,22 @@
 #include <yss/debug.h>
 #include <std_ext/string.h>
 #include <util/ElapsedTime.h>
+#include <UsbClass/NuvotonDualCdc.h>
 #include <UsbClass/NuvotonCdc.h>
 #include <stdio.h>
 #include <string.h>
 
-NuvotonCdc cdc;
+NuvotonDualCdc cdc;
 
 void thread_blinkLedR(void);
 void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
+void thread_testCdcEcho0(void);
+void thread_testCdcEcho1(void);
 
 int main(void)
 {
-	char sendBuf[256], rcvBuf[64];
-	uint32_t len, cnt = 0;
-
 	// 운영체체 초기화
 	initializeYss();
 
@@ -39,24 +39,7 @@ int main(void)
 	thread::add(thread_testUart, 512);
 
 	// CDC 초기화
-	const char *manufacture = "Nuvoton";
-	const char *product= "yss OS Virtual COM Port";
-
-	Cdc::config_t cdcConfig = 
-	{
-		1,				//uint8_t inEpNum;
-		64,				//uint16_t inEpMaxPacketSize;
-		2,				//uint8_t outEpNum;
-		64,				//uint16_t outEpMaxPacketSize;
-		3,				//uint8_t ctlEpNum;
-		8,				//uint16_t ctlEpMaxPacketSize;
-		manufacture,	//const char *manufactureString;
-		product,		//const char *productString;
-		0				//const char *serialNumberString;
-	};
-
-	cdc.initialize(cdcConfig);
-	//cdc.initialize();
+	cdc.initialize();
 
 	// USBD 초기화
 	gpioA.setAsAltFunc(12, Gpio::PA12_USB_VBUS);
@@ -68,25 +51,56 @@ int main(void)
 	usbd.initialize(cdc);
 	usbd.enableInterrupt();
 
-	thread::delay(5000);
-	
+	// CDC Port0 ECHO Test
+	thread::add(thread_testCdcEcho0, 512);
+
+	// CDC Port1 ECHO Test
+	thread::add(thread_testCdcEcho1, 512);
+
 	while(1)
 	{
-		if(cdc.isClearToSend())
+		thread::yield();
+	}
+}
+
+void thread_testCdcEcho0(void)
+{
+	char buf[64];
+	uint32_t len;
+
+	while(1)
+	{
+		if(cdc.isClearToSend0())
 		{
-			sprintf(sendBuf, "Hello World!! Test String!! yss OS is Great Operating System!! Have a Enjoy!! %d\n\r", cnt++); 
-			len = strlen(sendBuf);
-			cdc.send(sendBuf, len); // 최대 초당 750 kB 전송속도 확인
+			len = cdc.getRxDataCount0();
+			if(len > 0)
+			{
+				cdc.getRxData0(buf, len);
+				cdc.send0(buf, len);
+			}
 		}
 
-		len = cdc.getRxDataCount();
-		if(len > 0)
+		thread::yield();
+	}
+}
+
+void thread_testCdcEcho1(void)
+{
+	char buf[64];
+	uint32_t len;
+
+	while(1)
+	{
+		if(cdc.isClearToSend1())
 		{
-			cdc.getRxData(rcvBuf, len);
-			for(uint32_t i = 0; i < len; i++)
-				debug_printf("%c", rcvBuf[i]);
+			len = cdc.getRxDataCount1();
+			if(len > 0)
+			{
+				cdc.getRxData1(buf, len);
+				cdc.send1(buf, len);
+			}
 		}
-		
+
 		thread::yield();
 	}
 }
