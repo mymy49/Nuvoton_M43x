@@ -22,7 +22,7 @@ void initializeBoard(void)
 		Uart::MODE_NORMAL,	//mode_t mode;
 		115200,				//uint32_t baudrate;
 		Uart::STOP_1BIT,	//stopbit_t stopbit;
-		nullptr,			//void *rcvBuf;
+		NULL,			//void *rcvBuf;
 		64					//uint32_t rcvBufSize;
 	};
 

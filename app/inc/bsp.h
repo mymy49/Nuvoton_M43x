@@ -9,6 +9,7 @@
 #define BSP__H_
 
 #include <dev/led.h>
+#include <stdint.h>
 
 void initializeBoard(void);
 
