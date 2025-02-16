@@ -11,22 +11,22 @@
 #include <yss/debug.h>
 #include <std_ext/string.h>
 #include <util/ElapsedTime.h>
-#include <UsbClass/NuvotonDualCdc.h>
-#include <UsbClass/NuvotonCdc.h>
+#include <UsbClass/NuvotonAudio10.h>
 #include <stdio.h>
 #include <string.h>
 
-NuvotonDualCdc cdc;
+NuvotonAudio10 audio10;
 
 void thread_blinkLedR(void);
 void thread_blinkLedY(void);
 void thread_blinkLedG(void);
 void thread_testUart(void);
-void thread_testCdcEcho0(void);
-void thread_testCdcEcho1(void);
 
 int main(void)
 {
+	uint32_t cnt;
+	uint8_t data[512];
+
 	// 운영체체 초기화
 	initializeYss();
 
@@ -38,8 +38,8 @@ int main(void)
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
 
-	// CDC 초기화
-	cdc.initialize();
+	// USB Audio Class 초기화
+	audio10.initialize();
 
 	// USBD 초기화
 	gpioA.setAsAltFunc(12, Gpio::PA12_USB_VBUS);
@@ -48,57 +48,17 @@ int main(void)
 	gpioA.setAsAltFunc(15, Gpio::PA15_USB_OTG_ID);
 
 	usbd.enableClock();
-	usbd.initialize(cdc);
+	usbd.initialize(audio10);
 	usbd.enableInterrupt();
 
-	// CDC Port0 ECHO Test
-	thread::add(thread_testCdcEcho0, 512);
-
-	// CDC Port1 ECHO Test
-	thread::add(thread_testCdcEcho1, 512);
-
 	while(1)
 	{
-		thread::yield();
-	}
-}
+		cnt = audio10.getRxDataCount();
 
-void thread_testCdcEcho0(void)
-{
-	char buf[64];
-	uint32_t len;
-
-	while(1)
-	{
-		if(cdc.isClearToSend0())
+		if(cnt > 0)
 		{
-			len = cdc.getRxDataCount0();
-			if(len > 0)
-			{
-				cdc.getRxData0(buf, len);
-				cdc.send0(buf, len);
-			}
-		}
-
-		thread::yield();
-	}
-}
-
-void thread_testCdcEcho1(void)
-{
-	char buf[64];
-	uint32_t len;
-
-	while(1)
-	{
-		if(cdc.isClearToSend1())
-		{
-			len = cdc.getRxDataCount1();
-			if(len > 0)
-			{
-				cdc.getRxData1(buf, len);
-				cdc.send1(buf, len);
-			}
+			audio10.getRxData(data, cnt);
+			//debug_printf("%d\n", cnt);
 		}
 
 		thread::yield();
