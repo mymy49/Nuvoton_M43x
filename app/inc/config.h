@@ -31,7 +31,7 @@
 
 // ####################### GUI 설정 #######################
 // GUI library Enable (true, false)
-#define USE_GUI				false
+#define USE_GUI				true
 
 // ####################### KEY 설정 #######################
 // 최대 KEY 생성 가능 갯수 설정 (0 ~ ), 0일 경우 기능 꺼짐
