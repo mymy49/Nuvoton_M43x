@@ -12,6 +12,8 @@ Bmp565Buffer brush(5000);
 
 Touch_LCD_Shield_for_Arduino_2_8_inch lcd;
 
+FunctionQueue fq(16);
+
 void initializeBoard(void)
 {
 	// LED 초기화
@@ -51,7 +53,7 @@ void initializeBoard(void)
 	bpwm0.setAsPwmOutput(4);						// BPWM0의 CH4를 PWM 비반전 출력으로 설정
 	bpwm0.start();									// 타이머 카운터 시작
 
-	bpwm0.setDutyRatio(4, 1.f);						// BPWM0 CH4의 출력 듀티비를 50%로 설정
+	bpwm0.setDutyRatio(4, 0.f);						// BPWM0 CH4의 출력 듀티비를 50%로 설정
 
 	// LCD 초기화
 	gpioA.setAsOutput(3);	// CS
@@ -69,19 +71,31 @@ void initializeBoard(void)
 	lcd.initialize();
 	lcd.setBmp565Buffer(brush);
 
-	lcd.setBackgroundColor(0xFF, 0x00, 0x00);
-	lcd.clear();
-	thread::delay(1000);
-
-	lcd.setBackgroundColor(0x00, 0xFF, 0x00);
-	lcd.clear();
-	thread::delay(1000);
-
-	lcd.setBackgroundColor(0x00, 0x00, 0xFF);
-	lcd.clear();
-	thread::delay(1000);
-
-	lcd.setBackgroundColor(0x00, 0x00, 0x00);
+	lcd.setBackgroundColor(0xFF, 0xFF, 0xFF);
 	lcd.clear();
 }
 
+void setLcdBackLight(float dimming)
+{
+	bpwm0.setDutyRatio(4, dimming);
+}
+
+void fadeinBackLight(void)
+{
+	// 백라이트를 Fade in 한다.
+	for(uint32_t i=0;i<=100;i++)
+	{
+		setLcdBackLight((float)i/100.f);
+		thread::delay(5);
+	}
+}
+
+void fadeoutBackLight(void)
+{
+	// 백라이트를 Fade out 한다.
+	for(uint32_t i=0;i<=100;i++)
+	{
+		setLcdBackLight((float)(100-i)/100.f);
+		thread::delay(5);
+	}
+}

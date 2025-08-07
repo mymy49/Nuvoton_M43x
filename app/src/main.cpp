@@ -6,13 +6,16 @@
  */
 
 #include <yss.h>
-#include <bsp.h>
-#include <util/runtime.h>
 #include <yss/debug.h>
-#include <std_ext/string.h>
+
+#include <util/runtime.h>
 #include <util/ElapsedTime.h>
+
+#include <task.h>
+#include <bsp.h>
+
 #include <stdio.h>
-#include <string.h>
+#include <std_ext/string.h>
 
 void thread_blinkLedR(void);
 void thread_blinkLedY(void);
@@ -31,6 +34,9 @@ int main(void)
 	thread::add(thread_blinkLedG, 512);
 	thread::add(thread_blinkLedY, 512);
 	thread::add(thread_testUart, 512);
+	
+	fq.start();
+	fq.add(Task::displayLogo);
 
 	while(1)
 	{

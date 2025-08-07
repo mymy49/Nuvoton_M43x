@@ -12,15 +12,23 @@
 
 #include <stdint.h>
 
+#include <util/FunctionQueue.h>
+
 #include <mod/spi_tft_lcd/Touch_LCD_Shield_for_Arduino_2_8_inch.h>
 
 #include <gui/Bmp565Buffer.h>
 
-void initializeBoard(void);
+extern FunctionQueue fq;
 
 extern Bmp565Buffer brush;
 
 extern Touch_LCD_Shield_for_Arduino_2_8_inch lcd;
+
+void initializeBoard(void);
+
+void fadeinBackLight(void);
+
+void fadeoutBackLight(void);
 
 #endif
 
